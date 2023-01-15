@@ -57,20 +57,35 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    if (currentDog.contains('mp4') || currentDog.contains('svg')) {
+    if (currentDog.contains('mp4') ||
+        currentDog.contains('svg') ||
+        currentDog.contains('gif')) {
       changeDog();
     }
 
-    return Scaffold(
-      body: Column(
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
           ImageCard(dog: currentDog),
-          ElevatedButton(
-              onPressed: () {
-                changeDog();
-                print(currentDog);
-              },
-              child: const Text('Next')),
+          const SizedBox(height: 10),
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ElevatedButton.icon(
+                onPressed: () {},
+                icon: const Icon(Icons.favorite),
+                label: const Text('Like'),
+              ),
+              const SizedBox(width: 10),
+              ElevatedButton(
+                onPressed: () {
+                  changeDog();
+                },
+                child: const Text('Next'),
+              ),
+            ],
+          ),
         ],
       ),
     );
@@ -88,9 +103,6 @@ class ImageCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var theme = Theme.of(context);
-    /* var style = theme.textTheme.displayMedium!.copyWith(
-      color: theme.colorScheme.onPrimary,
-    ); */
 
     return Card(
       color: theme.colorScheme.primary,
@@ -98,8 +110,8 @@ class ImageCard extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.all(20),
         child: SizedBox(
+          width: 500,
           child: Image.network('$dog', width: 100),
-          width: 200,
         ),
       ),
     );
