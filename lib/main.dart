@@ -46,7 +46,7 @@ class _MyHomePageState extends State<MyHomePage> {
   final DogRepository dogRepository = DogRepositoryImpl();
 
   var currentDog =
-      'https://hips.hearstapps.com/hmg-prod.s3.amazonaws.com/images/dog-puppy-on-garden-royalty-free-image-1586966191.jpg?crop=1.00xw:0.669xh;0,0.190xh&resize=640:*';
+      'https://cdn.britannica.com/60/8160-050-08CCEABC/German-shepherd.jpg';
 
   changeDog() async {
     var dog = await dogRepository.getDog();
@@ -57,6 +57,51 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold();
+    if (currentDog.contains('mp4') || currentDog.contains('svg')) {
+      changeDog();
+    }
+
+    return Scaffold(
+      body: Column(
+        children: [
+          ImageCard(dog: currentDog),
+          ElevatedButton(
+              onPressed: () {
+                changeDog();
+                print(currentDog);
+              },
+              child: const Text('Next')),
+        ],
+      ),
+    );
+  }
+}
+
+class ImageCard extends StatelessWidget {
+  const ImageCard({
+    Key? key,
+    required this.dog,
+  }) : super(key: key);
+
+  final dog;
+
+  @override
+  Widget build(BuildContext context) {
+    var theme = Theme.of(context);
+    /* var style = theme.textTheme.displayMedium!.copyWith(
+      color: theme.colorScheme.onPrimary,
+    ); */
+
+    return Card(
+      color: theme.colorScheme.primary,
+      semanticContainer: true,
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: SizedBox(
+          child: Image.network('$dog', width: 100),
+          width: 200,
+        ),
+      ),
+    );
   }
 }
