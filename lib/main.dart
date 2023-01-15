@@ -29,8 +29,8 @@ class MyApp extends StatelessWidget {
         title: 'Namer App',
         theme: ThemeData(
           useMaterial3: true,
-          colorScheme:
-              ColorScheme.fromSeed(seedColor: Color.fromARGB(255, 86, 7, 89)),
+          colorScheme: ColorScheme.fromSeed(
+              seedColor: const Color.fromARGB(255, 86, 7, 89)),
         ),
         home: const MyHomePage(),
       ),
@@ -38,7 +38,18 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class MyAppState extends ChangeNotifier {}
+class MyAppState extends ChangeNotifier {
+  var favorites = <String>[];
+
+  void toggleFavorite(dog) {
+    if (favorites.contains(dog)) {
+      db?.collection("favorites").doc().delete();
+    } else {
+      db?.collection("favorites").doc().set({"url": "$dog"});
+    }
+    notifyListeners();
+  }
+}
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key});
@@ -55,7 +66,7 @@ class _MyHomePageState extends State<MyHomePage> {
     Widget page;
     switch (selectedIndex) {
       case 0:
-        page = InitialPage();
+        page = const InitialPage();
         break;
       case 1:
         page = FavoritesPage();
@@ -69,14 +80,15 @@ class _MyHomePageState extends State<MyHomePage> {
           SafeArea(
             child: NavigationRail(
               extended: false,
+              // ignore: prefer_const_literals_to_create_immutables
               destinations: [
                 const NavigationRailDestination(
-                  icon: const Icon(Icons.home),
+                  icon: Icon(Icons.home),
                   label: Text('Home'),
                 ),
                 const NavigationRailDestination(
-                  icon: const Icon(Icons.favorite),
-                  label: const Text('Favorites'),
+                  icon: Icon(Icons.favorite),
+                  label: Text('Favorites'),
                 ),
               ],
               selectedIndex: selectedIndex,
@@ -110,7 +122,7 @@ class _InitialPageState extends State<InitialPage> {
   final DogRepository dogRepository = DogRepositoryImpl();
 
   var currentDog =
-      'https://cdn.britannica.com/60/8160-050-08CCEABC/German-shepherd.jpg';
+      'https://static.vecteezy.com/system/resources/previews/001/200/028/original/dog-png.png';
 
   changeDog() async {
     var dog = await dogRepository.getDog();
@@ -121,6 +133,8 @@ class _InitialPageState extends State<InitialPage> {
 
   @override
   Widget build(BuildContext context) {
+    var appState = context.watch<MyAppState>();
+
     if (currentDog.contains('mp4') ||
         currentDog.contains('svg') ||
         currentDog.contains('gif')) {
@@ -128,29 +142,33 @@ class _InitialPageState extends State<InitialPage> {
     }
 
     return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          ImageCard(dog: currentDog),
-          const SizedBox(height: 10),
-          Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              ElevatedButton.icon(
-                onPressed: () {},
-                icon: const Icon(Icons.favorite),
-                label: const Text('Like'),
-              ),
-              const SizedBox(width: 10),
-              ElevatedButton(
-                onPressed: () {
-                  changeDog();
-                },
-                child: const Text('Next'),
-              ),
-            ],
-          ),
-        ],
+      child: SingleChildScrollView(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            ImageCard(dog: currentDog),
+            const SizedBox(height: 10),
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                ElevatedButton.icon(
+                  onPressed: () {
+                    appState.toggleFavorite(currentDog);
+                  },
+                  icon: const Icon(Icons.favorite),
+                  label: const Text('Like'),
+                ),
+                const SizedBox(width: 10),
+                ElevatedButton(
+                  onPressed: () {
+                    changeDog();
+                  },
+                  child: const Text('Next'),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -174,6 +192,7 @@ class ImageCard extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.all(20),
         child: SizedBox(
+          height: 400,
           width: 500,
           child: Image.network('$dog', width: 100),
         ),
