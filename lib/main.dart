@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_application_4/repositories/dog_repository.dart';
 import 'package:flutter_application_4/repositories/dog_repository_impl.dart';
 import 'firebase_options.dart';
+import 'package:provider/provider.dart';
 
 FirebaseFirestore? db;
 
@@ -20,15 +21,19 @@ void main() async {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
+    return ChangeNotifierProvider(
+      create: (context) => MyAppState(),
+      child: MaterialApp(
+        title: 'Namer App',
+        theme: ThemeData(
+          useMaterial3: true,
+          colorScheme:
+              ColorScheme.fromSeed(seedColor: Color.fromARGB(255, 86, 7, 89)),
+        ),
+        home: const MyHomePage(),
       ),
-      home: const MyHomePage(),
     );
   }
 }
@@ -43,6 +48,65 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  var selectedIndex = 0;
+
+  @override
+  Widget build(BuildContext context) {
+    Widget page;
+    switch (selectedIndex) {
+      case 0:
+        page = InitialPage();
+        break;
+      case 1:
+        page = FavoritesPage();
+        break;
+      default:
+        throw UnimplementedError('no widget for $selectedIndex');
+    }
+    return Scaffold(
+      body: Row(
+        children: [
+          SafeArea(
+            child: NavigationRail(
+              extended: false,
+              destinations: [
+                const NavigationRailDestination(
+                  icon: const Icon(Icons.home),
+                  label: Text('Home'),
+                ),
+                const NavigationRailDestination(
+                  icon: const Icon(Icons.favorite),
+                  label: const Text('Favorites'),
+                ),
+              ],
+              selectedIndex: selectedIndex,
+              onDestinationSelected: (value) {
+                setState(() {
+                  selectedIndex = value;
+                });
+              },
+            ),
+          ),
+          Expanded(
+            child: Container(
+              color: Theme.of(context).colorScheme.primaryContainer,
+              child: page,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class InitialPage extends StatefulWidget {
+  const InitialPage({super.key});
+
+  @override
+  State<InitialPage> createState() => _InitialPageState();
+}
+
+class _InitialPageState extends State<InitialPage> {
   final DogRepository dogRepository = DogRepositoryImpl();
 
   var currentDog =
@@ -115,5 +179,13 @@ class ImageCard extends StatelessWidget {
         ),
       ),
     );
+  }
+}
+
+class FavoritesPage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    // TODO: implement build
+    throw UnimplementedError();
   }
 }
