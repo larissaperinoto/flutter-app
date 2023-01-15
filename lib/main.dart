@@ -40,14 +40,10 @@ class MyApp extends StatelessWidget {
 
 class MyAppState extends ChangeNotifier {
   var favorites = <String>[];
+  var loading = false;
 
   void toggleFavorite(dog) {
-    if (favorites.contains(dog)) {
-      db?.collection("favorites").doc().delete();
-    } else {
-      db?.collection("favorites").doc().set({"url": "$dog"});
-    }
-    notifyListeners();
+    db?.collection("favorites").doc('favorites').set({'url': '$dog'});
   }
 }
 
@@ -134,6 +130,7 @@ class _InitialPageState extends State<InitialPage> {
   @override
   Widget build(BuildContext context) {
     var appState = context.watch<MyAppState>();
+    var start = false;
 
     if (currentDog.contains('mp4') ||
         currentDog.contains('svg') ||
@@ -146,27 +143,41 @@ class _InitialPageState extends State<InitialPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            Visibility(
+                visible: appState.loading == true,
+                child: const CircularProgressIndicator()),
             ImageCard(dog: currentDog),
             const SizedBox(height: 10),
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                ElevatedButton.icon(
+            Visibility(
+              visible: start == false,
+              replacement: ElevatedButton(
                   onPressed: () {
-                    appState.toggleFavorite(currentDog);
+                    setState(() {
+                      start = false;
+                      print(start);
+                    });
                   },
-                  icon: const Icon(Icons.favorite),
-                  label: const Text('Like'),
-                ),
-                const SizedBox(width: 10),
-                ElevatedButton(
-                  onPressed: () {
-                    changeDog();
-                  },
-                  child: const Text('Next'),
-                ),
-              ],
-            ),
+                  child: const Text('Start')),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  ElevatedButton.icon(
+                    onPressed: () {
+                      appState.toggleFavorite(currentDog);
+                    },
+                    icon: const Icon(Icons.favorite),
+                    label: const Text('Like'),
+                  ),
+                  const SizedBox(width: 10),
+                  ElevatedButton(
+                    onPressed: () {
+                      changeDog();
+                    },
+                    child: const Text('Next'),
+                  ),
+                ],
+              ),
+            )
           ],
         ),
       ),
@@ -201,10 +212,32 @@ class ImageCard extends StatelessWidget {
   }
 }
 
-class FavoritesPage extends StatelessWidget {
+class FavoritesPage extends StatefulWidget {
+  const FavoritesPage({super.key});
+
+  @override
+  State<StatefulWidget> createState() => _FavoritePageState();
+}
+
+class _FavoritePageState extends State<FavoritesPage> {
+  String dog = '';
+
+  @override
+  void initState() {
+    super.initState();
+    db?.collection("favorites").doc('favorites').get().then((data) {
+      setState(() {
+        dog = data['url'];
+      });
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
-    throw UnimplementedError();
+    return ListView(
+      children: [
+        ImageCard(dog: dog),
+      ],
+    );
   }
 }
