@@ -1,16 +1,18 @@
-# flutter_application_4
+# Flutter App
 
-A new Flutter project.
+A aplicação permite visualizar imagens de cachorros que podem ser salvas sendo associadas a uma frase inserida pelo usuário. Em uma segunda página o usuário pode consultar a imagem e a frase que salvou.
 
-## Getting Started
+## Tecnologias e ferramentas
 
-This project is a starting point for a Flutter application.
+<div>
+  <img src='https://img.shields.io/badge/Flutter-02569B?style=for-the-badge&logo=flutter&logoColor=white' alt='Flutter' >
+  <img src='https://img.shields.io/badge/firebase-ffca28?style=for-the-badge&logo=firebase&logoColor=black' alt='Firebase' >
+</div>
 
-A few resources to get you started if this is your first Flutter project:
+- [Flutter](https://flutter.dev/)
+- [Firebase](https://firebase.google.com/?hl=pt)
+- [Random Dog API](https://random.dog/)
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+---
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+Desenvolvido por [Larissa Perinoto](https://larissaperinoto.com.br/).
