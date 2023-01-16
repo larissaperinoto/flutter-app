@@ -42,8 +42,11 @@ class MyAppState extends ChangeNotifier {
   var favorites = <String>[];
   var loading = false;
 
-  void toggleFavorite(dog) {
-    db?.collection("favorites").doc('favorites').set({'url': '$dog'});
+  void toggleFavorite(dog, String int) {
+    db
+        ?.collection("favorites")
+        .doc('favorites')
+        .set({'url': '$dog', 'int': int});
   }
 }
 
@@ -65,7 +68,7 @@ class _MyHomePageState extends State<MyHomePage> {
         page = const InitialPage();
         break;
       case 1:
-        page = FavoritesPage();
+        page = const FavoritesPage();
         break;
       default:
         throw UnimplementedError('no widget for $selectedIndex');
@@ -127,6 +130,8 @@ class _InitialPageState extends State<InitialPage> {
     });
   }
 
+  final _controller = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     var appState = context.watch<MyAppState>();
@@ -154,7 +159,6 @@ class _InitialPageState extends State<InitialPage> {
                   onPressed: () {
                     setState(() {
                       start = false;
-                      print(start);
                     });
                   },
                   child: const Text('Start')),
@@ -163,10 +167,10 @@ class _InitialPageState extends State<InitialPage> {
                 children: [
                   ElevatedButton.icon(
                     onPressed: () {
-                      appState.toggleFavorite(currentDog);
+                      appState.toggleFavorite(currentDog, _controller.text);
                     },
                     icon: const Icon(Icons.favorite),
-                    label: const Text('Like'),
+                    label: const Text('Guardar para depois'),
                   ),
                   const SizedBox(width: 10),
                   ElevatedButton(
@@ -177,7 +181,22 @@ class _InitialPageState extends State<InitialPage> {
                   ),
                 ],
               ),
-            )
+            ),
+            const SizedBox(height: 20),
+            Padding(
+              padding: const EdgeInsets.all(20),
+              child: SizedBox(
+                width: 500,
+                child: TextField(
+                  controller: _controller,
+                  // ignore: prefer_const_constructors
+                  decoration: InputDecoration(
+                    border: const OutlineInputBorder(),
+                    labelText: 'Insira uma frase fofinha',
+                  ),
+                ),
+              ),
+            ),
           ],
         ),
       ),
@@ -221,6 +240,7 @@ class FavoritesPage extends StatefulWidget {
 
 class _FavoritePageState extends State<FavoritesPage> {
   String dog = '';
+  String int = '';
 
   @override
   void initState() {
@@ -228,6 +248,7 @@ class _FavoritePageState extends State<FavoritesPage> {
     db?.collection("favorites").doc('favorites').get().then((data) {
       setState(() {
         dog = data['url'];
+        int = data['int'];
       });
     });
   }
@@ -237,6 +258,7 @@ class _FavoritePageState extends State<FavoritesPage> {
     return ListView(
       children: [
         ImageCard(dog: dog),
+        Text(int),
       ],
     );
   }
