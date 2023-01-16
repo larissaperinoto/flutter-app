@@ -42,11 +42,11 @@ class MyAppState extends ChangeNotifier {
   var favorites = <String>[];
   var loading = false;
 
-  void toggleFavorite(dog, String int) {
+  void setFirestore(String dog, String phrase) {
     db
         ?.collection("favorites")
         .doc('favorites')
-        .set({'url': '$dog', 'int': int});
+        .set({'image': dog, 'phrase': phrase});
   }
 }
 
@@ -86,7 +86,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   label: Text('Home'),
                 ),
                 const NavigationRailDestination(
-                  icon: Icon(Icons.favorite),
+                  icon: Icon(Icons.save_rounded),
                   label: Text('Favorites'),
                 ),
               ],
@@ -135,7 +135,6 @@ class _InitialPageState extends State<InitialPage> {
   @override
   Widget build(BuildContext context) {
     var appState = context.watch<MyAppState>();
-    var start = false;
 
     if (currentDog.contains('mp4') ||
         currentDog.contains('svg') ||
@@ -153,34 +152,24 @@ class _InitialPageState extends State<InitialPage> {
                 child: const CircularProgressIndicator()),
             ImageCard(dog: currentDog),
             const SizedBox(height: 10),
-            Visibility(
-              visible: start == false,
-              replacement: ElevatedButton(
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                ElevatedButton.icon(
                   onPressed: () {
-                    setState(() {
-                      start = false;
-                    });
+                    appState.setFirestore(currentDog, _controller.text);
                   },
-                  child: const Text('Start')),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  ElevatedButton.icon(
-                    onPressed: () {
-                      appState.toggleFavorite(currentDog, _controller.text);
-                    },
-                    icon: const Icon(Icons.favorite),
-                    label: const Text('Guardar para depois'),
-                  ),
-                  const SizedBox(width: 10),
-                  ElevatedButton(
-                    onPressed: () {
-                      changeDog();
-                    },
-                    child: const Text('Next'),
-                  ),
-                ],
-              ),
+                  icon: const Icon(Icons.save),
+                  label: const Text('Guardar para depois'),
+                ),
+                const SizedBox(width: 10),
+                ElevatedButton(
+                  onPressed: () {
+                    changeDog();
+                  },
+                  child: const Text('Next'),
+                ),
+              ],
             ),
             const SizedBox(height: 20),
             Padding(
@@ -210,7 +199,7 @@ class ImageCard extends StatelessWidget {
     required this.dog,
   }) : super(key: key);
 
-  final dog;
+  final String dog;
 
   @override
   Widget build(BuildContext context) {
@@ -224,7 +213,7 @@ class ImageCard extends StatelessWidget {
         child: SizedBox(
           height: 400,
           width: 500,
-          child: Image.network('$dog', width: 100),
+          child: Image.network(dog, width: 100),
         ),
       ),
     );
@@ -240,15 +229,15 @@ class FavoritesPage extends StatefulWidget {
 
 class _FavoritePageState extends State<FavoritesPage> {
   String dog = '';
-  String int = '';
+  String phrase = '';
 
   @override
   void initState() {
     super.initState();
     db?.collection("favorites").doc('favorites').get().then((data) {
       setState(() {
-        dog = data['url'];
-        int = data['int'];
+        dog = data['image'];
+        phrase = data['phrase'];
       });
     });
   }
@@ -258,7 +247,7 @@ class _FavoritePageState extends State<FavoritesPage> {
     return ListView(
       children: [
         ImageCard(dog: dog),
-        Text(int),
+        Text(phrase),
       ],
     );
   }
