@@ -244,11 +244,17 @@ class _FavoritePageState extends State<FavoritesPage> {
 
   @override
   Widget build(BuildContext context) {
-    return ListView(
-      children: [
-        ImageCard(dog: dog),
-        Text(phrase),
-      ],
+    return Center(
+      child: SingleChildScrollView(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            ImageCard(dog: dog),
+            const SizedBox(height: 10),
+            Text(phrase),
+          ],
+        ),
+      ),
     );
   }
 }
