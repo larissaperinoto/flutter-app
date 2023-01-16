@@ -39,9 +39,6 @@ class MyApp extends StatelessWidget {
 }
 
 class MyAppState extends ChangeNotifier {
-  var favorites = <String>[];
-  var loading = false;
-
   void setFirestore(String dog, String phrase) {
     db
         ?.collection("favorites")
@@ -147,9 +144,6 @@ class _InitialPageState extends State<InitialPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Visibility(
-                visible: appState.loading == true,
-                child: const CircularProgressIndicator()),
             ImageCard(dog: currentDog),
             const SizedBox(height: 10),
             Row(
